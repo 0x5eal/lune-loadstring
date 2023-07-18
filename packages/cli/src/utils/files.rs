@@ -185,16 +185,3 @@ pub fn parse_lune_description_from_file(contents: &str) -> Option<String> {
         Some(unindented_lines)
     }
 }
-
-pub fn strip_shebang(contents: Vec<u8>) -> Vec<u8> {
-    let Some(start) = contents.iter().position(|x| !x.is_ascii_whitespace()) else {
-        return contents[0..0].to_vec()
-    };
-
-    let end = contents
-        .iter()
-        .rposition(|x| !x.is_ascii_whitespace())
-        .unwrap();
-
-    contents[start..=end].to_vec()
-}

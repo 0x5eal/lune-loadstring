@@ -1,4 +1,5 @@
 use mlua::prelude::*;
+use mlua::Compiler as LuaCompiler;
 use std::io::{self, Write as _};
 
 #[cfg(feature = "roblox")]
@@ -30,7 +31,8 @@ pub fn warn(_: &Lua, args: LuaMultiValue) -> LuaResult<()> {
 }
 
 pub fn loadstring<'lua>(lua: &'lua Lua, source: LuaString) -> LuaResult<LuaFunction<'lua>> {
-    let lua_object = lua.load(source.to_str()?.trim_start()).into_function();
+    let source_bytecode = LuaCompiler::default().compile(&source);
+    let lua_object = lua.load(source_bytecode).into_function();
 
     match lua_object {
         Ok(lua_function) => Ok(lua_function),
