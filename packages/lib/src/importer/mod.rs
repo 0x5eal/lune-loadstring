@@ -26,6 +26,7 @@ pub fn create(lua: &'static Lua, args: Vec<String>) -> LuaResult<()> {
         ("require", require_fn),
         ("print", lua.create_function(top_level::print)?),
         ("warn", lua.create_function(top_level::warn)?),
+        ("loadstring", lua.create_function(top_level::loadstring)?),
         ("error", lua.create_function(top_level::error)?),
         ("type", lua.create_function(top_level::proxy_type)?),
         ("typeof", lua.create_function(top_level::proxy_typeof)?),

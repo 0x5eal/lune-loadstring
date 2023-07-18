@@ -29,6 +29,15 @@ pub fn warn(_: &Lua, args: LuaMultiValue) -> LuaResult<()> {
     Ok(())
 }
 
+pub fn loadstring<'lua>(lua: &'lua Lua, source: LuaString) -> LuaResult<LuaFunction<'lua>> {
+    let lua_object = lua.load(source.to_str()?).into_function();
+
+    match lua_object {
+        Ok(lua_function) => Ok(lua_function),
+        Err(exception) => Err(LuaError::RuntimeError(exception.to_string())),
+    }
+}
+
 // HACK: We need to preserve the default behavior of
 // the lua error function, for pcall and such, which
 // is really tricky to do from scratch so we will
