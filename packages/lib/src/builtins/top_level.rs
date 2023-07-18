@@ -30,7 +30,7 @@ pub fn warn(_: &Lua, args: LuaMultiValue) -> LuaResult<()> {
 }
 
 pub fn loadstring<'lua>(lua: &'lua Lua, source: LuaString) -> LuaResult<LuaFunction<'lua>> {
-    let lua_object = lua.load(source.to_str()?).into_function();
+    let lua_object = lua.load(source.to_str()?.trim_start()).into_function();
 
     match lua_object {
         Ok(lua_function) => Ok(lua_function),
