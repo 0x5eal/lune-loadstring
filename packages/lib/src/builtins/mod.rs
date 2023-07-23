@@ -1,4 +1,5 @@
 pub(crate) mod fs;
+pub(crate) mod luau;
 pub(crate) mod net;
 pub(crate) mod process;
 pub(crate) mod serde;

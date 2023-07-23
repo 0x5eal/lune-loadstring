@@ -13,6 +13,7 @@ pub fn create(lua: &'static Lua, args: Vec<String>) -> LuaResult<()> {
         ("process", builtins::process::create(lua, args)?),
         ("serde", builtins::serde::create(lua)?),
         ("stdio", builtins::stdio::create(lua)?),
+        ("luau", builtins::luau::create(lua)?),
         ("task", builtins::task::create(lua)?),
         #[cfg(feature = "roblox")]
         ("roblox", builtins::roblox::create(lua)?),
@@ -26,7 +27,6 @@ pub fn create(lua: &'static Lua, args: Vec<String>) -> LuaResult<()> {
         ("require", require_fn),
         ("print", lua.create_function(top_level::print)?),
         ("warn", lua.create_function(top_level::warn)?),
-        ("loadstring", lua.create_function(top_level::loadstring)?),
         ("error", lua.create_function(top_level::error)?),
         ("type", lua.create_function(top_level::proxy_type)?),
         ("typeof", lua.create_function(top_level::proxy_typeof)?),
