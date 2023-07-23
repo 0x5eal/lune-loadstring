@@ -1,5 +1,4 @@
 use mlua::prelude::*;
-use mlua::Compiler as LuaCompiler;
 use std::io::{self, Write as _};
 
 #[cfg(feature = "roblox")]
@@ -28,16 +27,6 @@ pub fn warn(_: &Lua, args: LuaMultiValue) -> LuaResult<()> {
     stdout.write_all(formatted.as_bytes())?;
     stdout.flush()?;
     Ok(())
-}
-
-pub fn loadstring<'lua>(lua: &'lua Lua, source: LuaString) -> LuaResult<LuaFunction<'lua>> {
-    let source_bytecode = LuaCompiler::default().compile(&source);
-    let lua_object = lua.load(source_bytecode).into_function();
-
-    match lua_object {
-        Ok(lua_function) => Ok(lua_function),
-        Err(exception) => Err(LuaError::RuntimeError(exception.to_string())),
-    }
 }
 
 // HACK: We need to preserve the default behavior of
