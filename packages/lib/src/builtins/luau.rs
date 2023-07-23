@@ -1,5 +1,6 @@
 use mlua::prelude::*;
 use mlua::Compiler as LuaCompiler;
+use once_cell::sync::Lazy;
 
 use crate::lua::table::TableBuilder;
 
@@ -10,29 +11,53 @@ pub fn create(lua: &'static Lua) -> LuaResult<LuaTable> {
         .build_readonly()
 }
 
+struct CompileOptions {
+    optimization_level: u8,
+    coverage_level: u8,
+    debug_level: u8,
+}
+
+impl Default for CompileOptions {
+    fn default() -> Self {
+        Self {
+            optimization_level: 1,
+            coverage_level: 0,
+            debug_level: 1,
+        }
+    }
+}
+
 fn compile_source<'a>(
     lua: &'static Lua,
     (source, options): (LuaString<'a>, Option<LuaTable<'a>>),
 ) -> LuaResult<LuaString<'a>> {
-    let mut optimization_level = 1;
-    let mut coverage_level = 0;
-    let mut debug_level = 1;
-
-    if let Some(options) = options {
-        optimization_level = options.raw_get("optimizationLevel")?;
-        coverage_level = options.raw_get("coverageLevel")?;
-        debug_level = options.raw_get("debugLevel")?;
+    if let None = options {
+        compile(CompileOptions::default());
     }
+    
+    let mut optimization_level: Lazy<u8> = Lazy::new(|| options.raw_get("optimizationLevel")?);
+    let mut coverage_level: Lazy<u8> = Lazy::new(|| options.raw_get("coverageLevel")?);
+    let mut debug_level: Lazy<u8> = Lazy::new(|| options.raw_get("debugLevel")?);
 
-    let source_bytecode_bytes = LuaCompiler::default()
-        .set_optimization_level(optimization_level)
-        .set_coverage_level(coverage_level)
-        .set_debug_level(debug_level)
-        .compile(source);
+    compile(CompileOptions { optimization_level, coverage_level, debug_level });
 
-    match lua.create_string(source_bytecode_bytes) {
-        Ok(lua_string) => Ok(lua_string),
-        Err(exception) => Err(LuaError::RuntimeError(exception.to_string())),
+    let compile = |opts: CompileOptions| {
+        let optimization_level = opts.optimization_level;
+        let coverage_level = opts.coverage_level;
+        let debug_level = opts.debug_level;
+
+        let source_bytecode_bytes = LuaCompiler::default()
+            .set_optimization_level(optimization_level)
+            .set_coverage_level(coverage_level)
+            .set_debug_level(debug_level)
+            .compile(source);
+
+        match lua.create_string(source_bytecode_bytes) {
+            Ok(lua_string) => Ok(lua_string),
+            Err(exception) => Err(LuaError::RuntimeError(exception.to_string())),
+        };
+
+        return
     }
 }
 
